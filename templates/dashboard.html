@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="my-4">Welcome, {{ current_user.username }}</h2>
+
+    <a href="{{ url_for('create_session') }}" class="btn btn-primary mb-3">Create New Session</a>
+
+    {% for session in sessions %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">{{ session.title }}</h5>
+            <p class="card-text">{{ session.description }}</p>
+            <p class="card-text"><strong>Speaker:</strong> {{ session.speaker }}</p>
+            <p class="card-text"><strong>Time:</strong> {{ session.start_time.strftime('%Y-%m-%d %H:%M') }} to {{ session.end_time.strftime('%Y-%m-%d %H:%M') }}</p>
+
+            {% if session.summary %}
+            <p class="card-text"><strong>Summary:</strong> {{ session.summary }}</p>
+            {% endif %}
+
+            <a href="{{ url_for('create_QRcode', session_id=session.id) }}" class="btn btn-secondary btn-sm">Generate QR</a>
+            <a href="{{ url_for('create_feedback', session_id=session.id) }}" class="btn btn-success btn-sm">View Feedback</a>
+            <a href="{{ url_for('generate_summary', session_id=session.id) }}" class="btn btn-info btn-sm">Generate Summary</a>
+        </div>
+    </div>
+    {% else %}
+        <p>No sessions created yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}

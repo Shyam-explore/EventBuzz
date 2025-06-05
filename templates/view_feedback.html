@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Feedback - {{ session.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Feedback for {{ session.title }}</h2>
+
+    {% if feedbacks %}
+        <ul class="list-group mt-3">
+            {% for fb in feedbacks %}
+                <li class="list-group-item">
+                    <strong>Rating:</strong> {{ fb.rating }}<br>
+                    <strong>Comment:</strong> {{ fb.comment }}<br>
+                    <strong>Sentiment:</strong> {{ fb.sentiment }}<br>
+                    <small class="text-muted">Time: {{ fb.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No feedback available yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

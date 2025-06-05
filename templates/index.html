@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %} Home - EventBuzz {% endblock %}
+{% block content %}
+<div class="text-center">
+    <h1>Welcome to EventBuzz</h1>
+    <p  class="lead">>Collect and analyze feedback from your event attendees in real-time.</p>
+    <a href="{{ url_for('login') }}" class="btn btn-primary">Login</a>
+    <a href="{{ url_for('register') }}" class="btn btn-secondary">Register</a>
+</div>
+{% endblock %}
