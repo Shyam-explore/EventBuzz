@@ -1,6 +1,6 @@
 from datetime import datetime
 from io import BytesIO
-
+from transformers import pipeline
 import qrcode
 from flask import Flask, redirect, request, url_for, render_template, flash,send_file
 from flask_sqlalchemy import SQLAlchemy
@@ -13,6 +13,7 @@ app.secret_key = '123456'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
+summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 
 class Admin(db.Model):
     __tablename__ = 'admin'
@@ -195,17 +196,15 @@ def generate_summary(session_id):
     if not feedbacks:
         flash('No feedbacks found','danger')
         return redirect(url_for('dashboard'))
-    avg_rating = sum(f.rating for f in feedbacks) / len(feedbacks)
-    summary = f"Average rating: {avg_rating:.1f}/5. Feedbacks Count: {len(feedbacks)}"
-    summary +="Overall sentiment:"
-    if avg_rating > 4:
-        summary+="Positive"
-    elif avg_rating >=2.5:
-        summary+="Mixed"
-    else:
-        summary+="Negative"
+    all_comments = " ".join([f.comment for f in feedbacks])
+    try:
+        summary_output = summarizer(all_comments,max_length=500,min_length=1)
+        generate_summary = summary_output[0]['summary_text']
+    except Exception as e:
+        flash(f'Error generating summary for session: {e}','danger')
+        return redirect(url_for('dashboard'))
 
-    session.summary = summary
+    session.summary = generate_summary
     db.session.commit()
     flash('Summary successfully generated','success')
     return redirect(url_for('dashboard'))
